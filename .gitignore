@@ -1,0 +1,72 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Large Data & Archives (>100MB / raw datasets)
+*.zip
+*.tar.gz
+data/raw/
+5. Battery Data Set/
+data/processed/battery_telemetry.csv
+data/processed/features.parquet
+data/processed/battery_telemetry.parquet
+
+# Large Model Weights (>100MB GitHub limit)
+artifacts/models/incident_classifier/*.pt
+artifacts/models/incident_classifier/*.safetensors
+artifacts/models/incident_classifier/distilbert_weights.pt
+artifacts/models/incident_classifier/model.safetensors
+colab_pack.zip
+results_*.zip
+
+# LLM cache & temp logs
+artifacts/llm_cache/
+reports/autoheal/log.jsonl
+
+# Python cache & virtualenvs
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.hypothesis/
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db

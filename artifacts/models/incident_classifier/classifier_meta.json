@@ -1,0 +1,11 @@
+{
+  "model_name": "distilbert-base-uncased",
+  "max_length": 64,
+  "categories": [
+    "thermal_overheat",
+    "overcurrent",
+    "overvoltage_or_undervoltage",
+    "sensor_fault",
+    "normal_observation"
+  ]
+}

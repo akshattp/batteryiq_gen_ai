@@ -1,0 +1,41 @@
+{
+  "initial_rows": 2089050,
+  "cleaned_rows": 2088961,
+  "dropped_duplicates": 0,
+  "rejected_range_rows": 39,
+  "missing_filled": 9,
+  "batteries": [
+    "B0005",
+    "B0006",
+    "B0007",
+    "B0018"
+  ],
+  "battery_counts": {
+    "B0005": 591453,
+    "B0006": 591453,
+    "B0007": 591429,
+    "B0018": 314626
+  },
+  "cycle_counts_per_battery": {
+    "B0005": 338,
+    "B0006": 338,
+    "B0007": 338,
+    "B0018": 266
+  },
+  "voltage_range": [
+    2.0032,
+    4.3137
+  ],
+  "temp_range": [
+    21.8102,
+    42.3325
+  ],
+  "current_range": [
+    -2.0291,
+    4.5088
+  ],
+  "soc_range": [
+    0.0,
+    100.0
+  ]
+}

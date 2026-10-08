@@ -1,0 +1,73 @@
+{
+  "lgbm": {
+    "mae": 0.0941,
+    "rmse": 0.1679,
+    "r2": 0.9968,
+    "beats_persistence": true,
+    "improvement_pct": 16.5
+  },
+  "persistence": {
+    "mae": 0.1127,
+    "rmse": 0.2473,
+    "r2": 0.993
+  },
+  "by_mode": {
+    "charge": {
+      "samples": 277080,
+      "mae": 0.0778,
+      "rmse": 0.1439,
+      "r2": 0.9951
+    },
+    "discharge": {
+      "samples": 32226,
+      "mae": 0.2338,
+      "rmse": 0.3041,
+      "r2": 0.9909
+    }
+  },
+  "by_ambient": {
+    "24C": {
+      "samples": 309306,
+      "mae": 0.0941,
+      "rmse": 0.1679
+    }
+  },
+  "linear_regression": {
+    "mae": 0.0404,
+    "rmse": 0.0856,
+    "r2": 0.9992
+  },
+  "feature_importances": {
+    "temp_c": 0.1191,
+    "dT_dt": 0.0931,
+    "voltage_v": 0.0271,
+    "dV_dt": 0.056,
+    "current_a": 0.0336,
+    "abs_current_a": 0.026,
+    "soc_pct": 0.084,
+    "cycle": 0.1531,
+    "is_charge": 0.0011,
+    "temp_minus_ambient": 0.13,
+    "temp_x_abs_current": 0.0713,
+    "soh_pct": 0.0169,
+    "temp_c_lag1": 0.0293,
+    "current_a_lag1": 0.0056,
+    "voltage_v_lag1": 0.0133,
+    "temp_c_lag5": 0.0256,
+    "current_a_lag5": 0.0053,
+    "voltage_v_lag5": 0.0187,
+    "temp_c_lag10": 0.0453,
+    "current_a_lag10": 0.0109,
+    "voltage_v_lag10": 0.0347
+  },
+  "metadata": {
+    "test_battery": "B0018",
+    "test_samples": 309306,
+    "horizon_steps": 10,
+    "lags": [
+      1,
+      5,
+      10
+    ]
+  }
+}

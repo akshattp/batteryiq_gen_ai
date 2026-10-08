@@ -1,0 +1,103 @@
+# tests/rag_eval.yaml - RAG Pipeline Benchmark Evaluation Dataset (Milestone M9 / Exp 4)
+# 20 diverse domain questions with expected source documents and topics.
+
+questions:
+  - id: "Q01"
+    question: "What chemical reactions occur during the initial stage of thermal runaway?"
+    expected_doc_id: "KB-01"
+    topic: "thermal_runaway"
+
+  - id: "Q02"
+    question: "Why does doubling the electric current quadruple the Joule heating in battery cells?"
+    expected_doc_id: "KB-02"
+    topic: "joule_heating"
+
+  - id: "Q03"
+    question: "What happens to the copper current collectors when cell voltage drops below 2.5V?"
+    expected_doc_id: "KB-03"
+    topic: "voltage_limits"
+
+  - id: "Q04"
+    question: "What are the safe operating temperature limits and critical cutoff thresholds for lithium-ion cells?"
+    expected_doc_id: "KB-03"
+    topic: "temperature_limits"
+
+  - id: "Q05"
+    question: "What is the tiered fault response ladder followed by the battery management system?"
+    expected_doc_id: "KB-04"
+    topic: "bms_protections"
+
+  - id: "Q06"
+    question: "How does the CC-CV charging protocol operate and when does current decay?"
+    expected_doc_id: "KB-05"
+    topic: "cc_cv_charging"
+
+  - id: "Q07"
+    question: "Why does DC fast charging at cold temperatures below freezing risk lithium plating?"
+    expected_doc_id: "KB-05"
+    topic: "lithium_plating"
+
+  - id: "Q08"
+    question: "What causes sensor drift and cumulative error in Coulomb counting SOC estimation?"
+    expected_doc_id: "KB-06"
+    topic: "coulomb_counting"
+
+  - id: "Q09"
+    question: "How does the BMS recalibrate state of charge using open circuit voltage lookup?"
+    expected_doc_id: "KB-06"
+    topic: "ocv_recalibration"
+
+  - id: "Q10"
+    question: "What are the primary aging mechanisms causing SEI growth and loss of active material?"
+    expected_doc_id: "KB-07"
+    topic: "battery_aging"
+
+  - id: "Q11"
+    question: "When is an electric vehicle traction battery considered to reach end of life criteria?"
+    expected_doc_id: "KB-07"
+    topic: "end_of_life"
+
+  - id: "Q12"
+    question: "What are the earliest telemetry signatures that indicate an internal short circuit in a cell?"
+    expected_doc_id: "KB-08"
+    topic: "internal_short"
+
+  - id: "Q13"
+    question: "How can you detect a stuck or flat-lined temperature sensor during battery cycling?"
+    expected_doc_id: "KB-09"
+    topic: "sensor_fault"
+
+  - id: "Q14"
+    question: "What physical tests and megohmmeter measurements are conducted during high voltage pack inspection?"
+    expected_doc_id: "KB-10"
+    topic: "inspection_checklist"
+
+  - id: "Q15"
+    question: "How does direct dielectric immersion cooling compare to indirect liquid cold plate cooling?"
+    expected_doc_id: "KB-11"
+    topic: "thermal_management"
+
+  - id: "Q16"
+    question: "What are the 5 weighted components and component weights in the Guardian deterministic risk engine?"
+    expected_doc_id: "KB-12"
+    topic: "guardian_risk_weights"
+
+  - id: "Q17"
+    question: "What hard safety overrides immediately force the Guardian risk level to CRITICAL or at least HIGH?"
+    expected_doc_id: "KB-12"
+    topic: "guardian_hard_overrides"
+
+  - id: "Q18"
+    question: "How does the Guardian Beta-VAE compute anomaly scores using the empirical CDF of validation errors?"
+    expected_doc_id: "KB-13"
+    topic: "guardian_vae_scoring"
+
+  - id: "Q19"
+    question: "How many steps ahead does the Guardian LightGBM temperature predictor forecast?"
+    expected_doc_id: "KB-14"
+    topic: "guardian_temp_predictor"
+
+  - id: "Q20"
+    question: "Why does the Guardian event monitor use a 15-second debounce window with escalation bypass?"
+    expected_doc_id: "KB-15"
+    topic: "guardian_events_debounce"

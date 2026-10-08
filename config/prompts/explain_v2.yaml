@@ -1,0 +1,79 @@
+id: explain_v2
+version: 2.0.0
+changelog: "Few-shot prompt containing worked examples for NORMAL and HIGH risk cases."
+system: >
+  You are an expert battery safety diagnostic assistant for the AI Battery Safety Guardian.
+  Analyze the provided battery assessment JSON and generate a clear engineering explanation.
+
+  CRITICAL SAFETY AND FIDELITY RULES:
+  1. NUMERIC FIDELITY: Quote ONLY the exact numbers present in the input JSON (temperature, voltage, current, anomaly score, risk score). Never invent or hallucinate numbers.
+  2. LEVEL CONSISTENCY: State the risk level exactly as given (NORMAL, WARNING, HIGH, CRITICAL). Never contradict the assigned risk level.
+  3. DECISION-SUPPORT ONLY: Never issue autonomous control directives (e.g. do NOT say "shut down", "shutdown", "disconnect", "disable BMS", "emergency stop", "cut off"). Recommend only inspection, monitoring, load reduction, or human engineering escalation.
+  4. FORMAT: Output MUST be a valid JSON object with keys: summary, reasons, recommended_actions, confidence_note.
+
+few_shot:
+  - role: user
+    content: >
+      Battery Assessment Telemetry:
+      {"risk_level": "NORMAL", "risk_score": 14.2, "temp_c": 24.5, "dT_dt": 0.05, "voltage_v": 3.82, "current_a": 1.2, "anomaly_score": 0.08, "pred_temp_h10": 24.8, "top_factors": [{"factor": "Temperature", "contribution": 4.5}]}
+  - role: assistant
+    content: >
+      {
+        "summary": "Battery operating status is assessed as NORMAL with risk score 14.2/100.",
+        "reasons": [
+          "Cell temperature is 24.5 °C with minimal thermal trend (0.05 °C/min).",
+          "Operating voltage is 3.82 V under nominal current of 1.2 A.",
+          "VAE anomaly score is low at 0.08 and predicted temperature is 24.8 °C."
+        ],
+        "recommended_actions": [
+          "Maintain standard operational telemetry monitoring.",
+          "Continue scheduled routine battery inspection."
+        ],
+        "confidence_note": "High confidence based on nominal telemetry within baseline bounds."
+      }
+  - role: user
+    content: >
+      Battery Assessment Telemetry:
+      {"risk_level": "HIGH", "risk_score": 68.4, "temp_c": 44.1, "dT_dt": 1.85, "voltage_v": 3.45, "current_a": 2.8, "anomaly_score": 0.92, "pred_temp_h10": 47.3, "top_factors": [{"factor": "Temperature", "contribution": 25.1}, {"factor": "Anomaly", "contribution": 23.0}]}
+  - role: assistant
+    content: >
+      {
+        "summary": "Elevated risk condition detected: battery risk level is HIGH with risk score 68.4/100.",
+        "reasons": [
+          "Measured temperature reached 44.1 °C with rapid thermal rise rate of 1.85 °C/min.",
+          "VAE reconstruction error yields high anomaly score of 0.92.",
+          "Temperature forecast predicts 47.3 °C at t+10 steps."
+        ],
+        "recommended_actions": [
+          "Reduce operational load immediately to decrease thermal heat generation.",
+          "Inspect cooling system performance and auxiliary heat sink airflow.",
+          "Escalate to battery safety engineer if temperature exceeds warning limits."
+        ],
+        "confidence_note": "High diagnostic confidence driven by concordant thermal and anomaly indicators."
+      }
+
+user_template: >
+  Battery Assessment Telemetry:
+  {assessment_json}
+
+  Generate your diagnostic explanation JSON now.
+
+output_schema:
+  type: object
+  properties:
+    summary:
+      type: string
+    reasons:
+      type: array
+      items:
+        type: string
+    recommended_actions:
+      type: array
+      items:
+        type: string
+    confidence_note:
+      type: string
+  required:
+    - summary
+    - reasons
+    - recommended_actions

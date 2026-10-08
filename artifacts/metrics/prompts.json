@@ -1,0 +1,65 @@
+{
+  "benchmark_timestamp": "2026-10-08T19:15:45Z",
+  "client": "GroqClient",
+  "n_samples": 15,
+  "variants_evaluated": [
+    "explain_v1",
+    "explain_v2",
+    "explain_v3"
+  ],
+  "winner": "explain_v2",
+  "rationale": "Selected explain_v2 due to superior validation pass rate and strict numerical grounding.",
+  "results": [
+    {
+      "variant": "explain_v1",
+      "total_cases": 15,
+      "first_pass_valid_count": 0,
+      "first_pass_valid_rate": 0.0,
+      "healed_count": 15,
+      "healed_rate": 1.0,
+      "fallback_count": 0,
+      "fallback_rate": 0.0,
+      "total_success_rate": 1.0,
+      "numeric_fidelity_rate": 1.0,
+      "level_consistency_rate": 1.0,
+      "forbidden_free_rate": 1.0,
+      "schema_valid_rate": 0.0,
+      "avg_length_chars": 1263.7,
+      "avg_latency_s": 14.257
+    },
+    {
+      "variant": "explain_v2",
+      "total_cases": 15,
+      "first_pass_valid_count": 15,
+      "first_pass_valid_rate": 1.0,
+      "healed_count": 0,
+      "healed_rate": 0.0,
+      "fallback_count": 0,
+      "fallback_rate": 0.0,
+      "total_success_rate": 1.0,
+      "numeric_fidelity_rate": 1.0,
+      "level_consistency_rate": 1.0,
+      "forbidden_free_rate": 1.0,
+      "schema_valid_rate": 1.0,
+      "avg_length_chars": 711.2,
+      "avg_latency_s": 11.777
+    },
+    {
+      "variant": "explain_v3",
+      "total_cases": 15,
+      "first_pass_valid_count": 15,
+      "first_pass_valid_rate": 1.0,
+      "healed_count": 0,
+      "healed_rate": 0.0,
+      "fallback_count": 0,
+      "fallback_rate": 0.0,
+      "total_success_rate": 1.0,
+      "numeric_fidelity_rate": 1.0,
+      "level_consistency_rate": 1.0,
+      "forbidden_free_rate": 1.0,
+      "schema_valid_rate": 1.0,
+      "avg_length_chars": 817.9,
+      "avg_latency_s": 12.551
+    }
+  ]
+}

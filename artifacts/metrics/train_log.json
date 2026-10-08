@@ -1,0 +1,31 @@
+{
+  "training_steps": 5,
+  "train_duration_s": 31.42,
+  "history": [
+    {
+      "step": 1,
+      "loss": 2.6407,
+      "elapsed_s": 8.33
+    },
+    {
+      "step": 2,
+      "loss": 2.4377,
+      "elapsed_s": 14.32
+    },
+    {
+      "step": 3,
+      "loss": 2.2891,
+      "elapsed_s": 19.95
+    },
+    {
+      "step": 4,
+      "loss": 2.1685,
+      "elapsed_s": 25.73
+    },
+    {
+      "step": 5,
+      "loss": 2.1047,
+      "elapsed_s": 31.41
+    }
+  ]
+}

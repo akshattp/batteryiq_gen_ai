@@ -1,0 +1,146 @@
+{
+  "battery_id": "B0005",
+  "cycle": 50,
+  "description": "Golden session recording for offline demo presentation without live API requirements.",
+  "telemetry_sequence": [
+    {
+      "t_s": 0.0,
+      "temp_c": 24.2,
+      "voltage_v": 4.15,
+      "current_a": 1.95,
+      "soc_pct": 98.5,
+      "soh_pct": 91.2,
+      "anomaly_score": 0.08,
+      "predicted_temp_c": 24.6,
+      "risk_score": 12.4,
+      "risk_level": "NORMAL"
+    },
+    {
+      "t_s": 350.0,
+      "temp_c": 31.8,
+      "voltage_v": 3.75,
+      "current_a": 1.98,
+      "soc_pct": 68.0,
+      "soh_pct": 91.2,
+      "anomaly_score": 0.22,
+      "predicted_temp_c": 33.2,
+      "risk_score": 26.8,
+      "risk_level": "NORMAL"
+    },
+    {
+      "t_s": 650.0,
+      "temp_c": 37.4,
+      "voltage_v": 3.48,
+      "current_a": 2.15,
+      "soc_pct": 38.5,
+      "soh_pct": 91.2,
+      "anomaly_score": 0.48,
+      "predicted_temp_c": 40.1,
+      "risk_score": 48.5,
+      "risk_level": "WARNING"
+    },
+    {
+      "t_s": 880.0,
+      "temp_c": 43.8,
+      "voltage_v": 3.12,
+      "current_a": 2.45,
+      "soc_pct": 14.2,
+      "soh_pct": 91.2,
+      "anomaly_score": 0.78,
+      "predicted_temp_c": 47.6,
+      "risk_score": 68.2,
+      "risk_level": "HIGH"
+    },
+    {
+      "t_s": 980.0,
+      "temp_c": 51.5,
+      "voltage_v": 2.38,
+      "current_a": 3.10,
+      "soc_pct": 2.0,
+      "soh_pct": 91.2,
+      "anomaly_score": 0.96,
+      "predicted_temp_c": 56.4,
+      "risk_score": 86.4,
+      "risk_level": "CRITICAL"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "B0005_c50_650_level_WARNING",
+      "t_s": 650.0,
+      "event_type": "LEVEL_TRANSITION",
+      "severity": "WARNING",
+      "risk_score": 48.5,
+      "reasons": [
+        "Temperature reached 37.4 °C (above 35.0 °C threshold)",
+        "Beta-VAE anomaly score breached warning envelope (0.48)"
+      ],
+      "recommendations": [
+        "Inspect thermal cooling airflow and cell balance.",
+        "Maintain telemetry monitoring.",
+        "Decision-support prototype. Not for vehicle control. Escalate to human engineer."
+      ]
+    },
+    {
+      "event_id": "B0005_c50_880_override",
+      "t_s": 880.0,
+      "event_type": "HARD_OVERRIDE",
+      "severity": "HIGH",
+      "risk_score": 68.2,
+      "reasons": [
+        "Effective temperature >= 42.0 °C hard safety override triggered"
+      ],
+      "recommendations": [
+        "Reduce discharge current demand immediately.",
+        "Escalate to lead battery systems engineer if parameters remain elevated beyond 3 minutes.",
+        "Decision-support prototype. Not for vehicle control. Escalate to human engineer."
+      ]
+    },
+    {
+      "event_id": "B0005_c50_980_override",
+      "t_s": 980.0,
+      "event_type": "HARD_OVERRIDE",
+      "severity": "CRITICAL",
+      "risk_score": 86.4,
+      "reasons": [
+        "Cell temperature >= 50.0 °C hard override triggered",
+        "Terminal voltage 2.38V below 2.50V lower operating envelope"
+      ],
+      "recommendations": [
+        "Immediately reduce charge/discharge current demand to minimum idle to lower resistive heating.",
+        "Escalate to lead battery systems engineer if parameters remain elevated beyond 3 minutes.",
+        "Decision-support prototype. Not for vehicle control. Escalate to human engineer."
+      ]
+    }
+  ],
+  "prebaked_explanations": {
+    "B0005_c50_980": {
+      "summary": "Battery risk level is CRITICAL with risk score 86.4 due to thermal runaway threshold breach and undervoltage.",
+      "reasons": [
+        "Cell temperature reached 51.5 °C which triggered non-negotiable CRITICAL hard safety override.",
+        "Voltage dropped to 2.38 V, breaching the 2.50 V lower operating safety envelope.",
+        "Anomaly score is 0.96 with predicted temperature reaching 56.4 °C at t+10."
+      ],
+      "recommended_actions": [
+        "Immediately reduce charge/discharge current demand to minimum idle to lower resistive heating.",
+        "Conduct urgent physical inspection of thermal management cooling systems.",
+        "Escalate to lead battery systems engineer if parameters remain elevated beyond 3 minutes.",
+        "Decision-support prototype. Not for vehicle control. Escalate to human engineer."
+      ],
+      "confidence_note": "Evaluated with verified deterministic template grounding rules."
+    }
+  },
+  "prebaked_qa": [
+    {
+      "question": "Why does heating decouple from current in an internal short?",
+      "answer": "### [Measured/Model]\nIn normal operational cycles, cell temperature rise is driven by external current resistive heating ($P = I^2 R$). However, during internal short circuits or exothermic decomposition, heat generation continues or accelerates even when current demand drops to zero.\n\n### [Knowledge Base]\nAccording to battery safety documentation [KB-01-C2], internal short circuits create localized microscopic dendritic pathways between electrodes. This triggers continuous internal chemical self-discharge through localized Joule dissipation [KB-02-C1]. Once SEI decomposition temperature (~80–120°C) is initiated, exothermic self-sustaining chemical breakdown decoupled from terminal current proceeds towards thermal runaway [KB-03-C2].",
+      "citations": ["[KB-01-C2]", "[KB-02-C1]", "[KB-03-C2]"]
+    },
+    {
+      "question": "What was the max temperature in cycle 120 and when?",
+      "code": "result = {'max_temp_c': float(df[df['cycle'] == 120]['temp_c'].max()), 't_s': float(df[(df['cycle'] == 120) & (df['temp_c'] == df[df['cycle'] == 120]['temp_c'].max())]['t_s'].iloc[0])}",
+      "result": {"max_temp_c": 39.8, "t_s": 1240.0},
+      "answer": "In cycle 120, the maximum cell temperature was 39.8 °C, observed at elapsed time t = 1240.0 seconds."
+    }
+  ]
+}

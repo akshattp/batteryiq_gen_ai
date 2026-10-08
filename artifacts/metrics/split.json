@@ -1,0 +1,24 @@
+{
+  "train_batteries": [
+    "B0005",
+    "B0006",
+    "B0007"
+  ],
+  "test_battery": "B0018",
+  "train_rows": 1266919,
+  "val_rows": 507416,
+  "test_rows": 314626,
+  "train_cycles": {
+    "B0005": 253,
+    "B0006": 253,
+    "B0007": 253
+  },
+  "val_cycles": {
+    "B0005": 85,
+    "B0006": 85,
+    "B0007": 85
+  },
+  "test_cycles": {
+    "B0018": 266
+  }
+}

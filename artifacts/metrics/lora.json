@@ -1,0 +1,49 @@
+{
+  "milestone": "M11",
+  "experiment": "Exp 7 (LoRA / QLoRA Explainer)",
+  "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "adapter_path": "artifacts\\models\\lora_explainer",
+  "smoke_mode": true,
+  "train_samples": 20,
+  "train_steps": 5,
+  "train_duration_s": 31.42,
+  "run_config": {
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "lora_dropout": 0.05,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj"
+    ],
+    "batch_size": 2,
+    "learning_rate": 0.0002,
+    "device": "cpu",
+    "gpu_name": "None",
+    "library_versions": {
+      "torch": "2.14.1+cpu",
+      "peft": "0.21.2",
+      "transformers": "5.19.0"
+    }
+  },
+  "evaluation": {
+    "eval_samples": 2,
+    "adapter_model": {
+      "eval_samples": 2,
+      "mean_rouge_l": 0.2418,
+      "json_validity_rate": 0.0,
+      "forbidden_violation_rate": 0.0
+    },
+    "base_model": {
+      "eval_samples": 2,
+      "mean_rouge_l": 0.2345,
+      "json_validity_rate": 0.0,
+      "forbidden_violation_rate": 0.0
+    },
+    "mean_rouge_l": 0.2418,
+    "json_validity_rate": 0.0,
+    "numeric_fidelity_rate": 1.0,
+    "forbidden_violation_rate": 0.0
+  }
+}

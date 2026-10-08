@@ -1,0 +1,257 @@
+{
+  "milestone": "M8",
+  "experiment": "Exp 5 (BERT Incident Classifier)",
+  "dataset": {
+    "total_samples": 750,
+    "is_synthetic": true,
+    "categories": [
+      "thermal_overheat",
+      "overcurrent",
+      "overvoltage_or_undervoltage",
+      "sensor_fault",
+      "normal_observation"
+    ],
+    "split": {
+      "train": 525,
+      "val": 112,
+      "test": 113
+    }
+  },
+  "training_config": {
+    "model_name": "distilbert-base-uncased",
+    "epochs": 3,
+    "batch_size": 16,
+    "device": "cuda",
+    "gpu_name": "Tesla T4",
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 1.2459,
+        "val_loss": 0.6274,
+        "val_accuracy": 1.0,
+        "val_macro_f1": 1.0
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.3277,
+        "val_loss": 0.113,
+        "val_accuracy": 1.0,
+        "val_macro_f1": 1.0
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.0912,
+        "val_loss": 0.0482,
+        "val_accuracy": 1.0,
+        "val_macro_f1": 1.0
+      }
+    ]
+  },
+  "baseline_tfidf": {
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "weighted_f1": 1.0,
+    "per_class_f1": {
+      "thermal_overheat": 1.0,
+      "overcurrent": 1.0,
+      "overvoltage_or_undervoltage": 1.0,
+      "sensor_fault": 1.0,
+      "normal_observation": 1.0
+    },
+    "confusion_matrix": [
+      [
+        23,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        22,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        23,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        23,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        22
+      ]
+    ]
+  },
+  "distilbert": {
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "weighted_f1": 1.0,
+    "per_class_f1": {
+      "thermal_overheat": 1.0,
+      "overcurrent": 1.0,
+      "overvoltage_or_undervoltage": 1.0,
+      "sensor_fault": 1.0,
+      "normal_observation": 1.0
+    },
+    "confusion_matrix": [
+      [
+        23,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        22,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        23,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        23,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        22
+      ]
+    ]
+  },
+  "sample_predictions": [
+    {
+      "text": "Standard baseline cycling log review conducted. All cell voltages closely balanced within 12 mV across pack. Battery cleared for continued service.",
+      "true_label": "normal_observation",
+      "baseline_pred": "normal_observation",
+      "bert_pred": "normal_observation",
+      "bert_confidence": 0.9558
+    },
+    {
+      "text": "Overcurrent protection triggered on discharge line. Discharge rate surged to 37.7 A for 4 consecutive seconds. Inverter control firmware logs flagged for review.",
+      "true_label": "overcurrent",
+      "baseline_pred": "overcurrent",
+      "bert_pred": "overcurrent",
+      "bert_confidence": 0.9488
+    },
+    {
+      "text": "Overvoltage alarm triggered during CC-CV charging phase. Voltage spiked to 4.37 V during top balancing, exceeding cutoff limit. Check cell balancing circuitry and wiring harness.",
+      "true_label": "overvoltage_or_undervoltage",
+      "baseline_pred": "overvoltage_or_undervoltage",
+      "bert_pred": "overvoltage_or_undervoltage",
+      "bert_confidence": 0.9508
+    },
+    {
+      "text": "Overcurrent protection triggered on discharge line. Current spiked to 32.4 A during sudden regenerative braking pulse. Check current sensor calibration and shunt resistor connections.",
+      "true_label": "overcurrent",
+      "baseline_pred": "overcurrent",
+      "bert_pred": "overcurrent",
+      "bert_confidence": 0.9478
+    },
+    {
+      "text": "Diagnostic check revealed questionable sensor readings. Sensor signal dropped to ground potential intermittently. Sensor replaced; bench recalibration confirmed normal operation.",
+      "true_label": "sensor_fault",
+      "baseline_pred": "sensor_fault",
+      "bert_pred": "sensor_fault",
+      "bert_confidence": 0.9482
+    },
+    {
+      "text": "Vehicle thermal management flagged abnormal heating. Busbar thermal camera inspection revealed hot spots peaking at 50.5 \u00b0C. Pack allowed to cool down to 25 \u00b0C before resuming diagnostics.",
+      "true_label": "thermal_overheat",
+      "baseline_pred": "thermal_overheat",
+      "bert_pred": "thermal_overheat",
+      "bert_confidence": 0.9627
+    },
+    {
+      "text": "Overvoltage alarm triggered during CC-CV charging phase. Cell potential sagged to 2.25 V, below minimum safe operating limit. Inspect cell internal resistance and state of health degradation.",
+      "true_label": "overvoltage_or_undervoltage",
+      "baseline_pred": "overvoltage_or_undervoltage",
+      "bert_pred": "overvoltage_or_undervoltage",
+      "bert_confidence": 0.9485
+    },
+    {
+      "text": "Technician suspected instrumentation failure on cell rig. NTC thermistor resistance reading stuck out of plausible physical range. Sensor replaced; bench recalibration confirmed normal operation.",
+      "true_label": "sensor_fault",
+      "baseline_pred": "sensor_fault",
+      "bert_pred": "sensor_fault",
+      "bert_confidence": 0.9495
+    },
+    {
+      "text": "Vehicle thermal management flagged abnormal heating. Module 2 thermistor recorded 58.0 \u00b0C, triggering critical thermal warning. Pack allowed to cool down to 25 \u00b0C before resuming diagnostics.",
+      "true_label": "thermal_overheat",
+      "baseline_pred": "thermal_overheat",
+      "bert_pred": "thermal_overheat",
+      "bert_confidence": 0.963
+    },
+    {
+      "text": "Technician reported excessive heat dissipation. Cell skin temp. climbed rapidly to 48.9 \u00b0C under standard discharge. Immediate thermal inspection recommended prior to next charge.",
+      "true_label": "thermal_overheat",
+      "baseline_pred": "thermal_overheat",
+      "bert_pred": "thermal_overheat",
+      "bert_confidence": 0.9615
+    },
+    {
+      "text": "Emergency thermal inspection conducted on pack. Module 2 thermistor recorded 60.2 \u00b0C, triggering critical thermal warning. Thermal runaway mitigation procedure was initiated.",
+      "true_label": "thermal_overheat",
+      "baseline_pred": "thermal_overheat",
+      "bert_pred": "thermal_overheat",
+      "bert_confidence": 0.9628
+    },
+    {
+      "text": "Intermittent sensor disconnect logged on CAN bus. Zero dT/dt reported while discharge current was actively flowing. Replace faulty thermistor harness and verify connector pin seating.",
+      "true_label": "sensor_fault",
+      "baseline_pred": "sensor_fault",
+      "bert_pred": "sensor_fault",
+      "bert_confidence": 0.9506
+    },
+    {
+      "text": "Post-charge quality control check carried out. Operating temperature steady at 24.2 \u00b0C throughout entire charge cycle. Next scheduled inspection in 50 operating cycles.",
+      "true_label": "normal_observation",
+      "baseline_pred": "normal_observation",
+      "bert_pred": "normal_observation",
+      "bert_confidence": 0.9573
+    },
+    {
+      "text": "Intermittent sensor disconnect logged on CAN bus. Temperature reading flat-lined at -5.0 \u00b0C for 45 minutes during cycling. Check wiring insulation for crimp defects or chafing.",
+      "true_label": "sensor_fault",
+      "baseline_pred": "sensor_fault",
+      "bert_pred": "sensor_fault",
+      "bert_confidence": 0.9487
+    },
+    {
+      "text": "Intermittent sensor disconnect logged on CAN bus. Sensor signal dropped to ground potential intermittently. Sensor replaced; bench recalibration confirmed normal operation.",
+      "true_label": "sensor_fault",
+      "baseline_pred": "sensor_fault",
+      "bert_pred": "sensor_fault",
+      "bert_confidence": 0.9488
+    }
+  ],
+  "model_dir": "artifacts/models/incident_classifier",
+  "caveat": "Model trained on synthetic technician reports generated via domain templates; high macro-F1 is expected due to consistent synthetic phrasing patterns."
+}

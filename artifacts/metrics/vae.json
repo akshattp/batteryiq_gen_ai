@@ -1,0 +1,53 @@
+{
+  "vae": {
+    "auroc": 0.9554,
+    "pr_auc": 0.9188,
+    "recall_at_5pct_fpr": 0.7988,
+    "target_met": true,
+    "per_fault_type": {
+      "thermal_ramp": {
+        "auroc": 1.0,
+        "pr_auc": 0.9996,
+        "recall_at_5pct_fpr": 1.0
+      },
+      "current_spike": {
+        "auroc": 1.0,
+        "pr_auc": 0.9996,
+        "recall_at_5pct_fpr": 1.0
+      },
+      "voltage_sag": {
+        "auroc": 1.0,
+        "pr_auc": 0.9996,
+        "recall_at_5pct_fpr": 1.0
+      },
+      "sensor_stuck": {
+        "auroc": 0.8973,
+        "pr_auc": 0.382,
+        "recall_at_5pct_fpr": 0.6753
+      },
+      "temp_current_decoupling": {
+        "auroc": 0.8796,
+        "pr_auc": 0.2855,
+        "recall_at_5pct_fpr": 0.3189
+      }
+    }
+  },
+  "baselines": {
+    "isolation_forest": {
+      "auroc": 0.8902,
+      "pr_auc": 0.6571,
+      "recall_at_5pct_fpr": 0.2963
+    },
+    "pca": {
+      "auroc": 0.9664,
+      "pr_auc": 0.9365,
+      "recall_at_5pct_fpr": 0.8192
+    }
+  },
+  "eval_dataset": {
+    "test_battery": "B0018",
+    "normal_windows": 30807,
+    "anomaly_windows": 12010,
+    "total_windows": 42817
+  }
+}

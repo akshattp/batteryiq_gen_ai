@@ -1,0 +1,409 @@
+{
+  "benchmark_timestamp": "2026-10-08T19:42:56Z",
+  "total_questions": 20,
+  "top_k": 4,
+  "hit_at_1": 0.95,
+  "hit_at_k": 1.0,
+  "target_hit_at_k": 0.8,
+  "hit_at_k_passed": true,
+  "citation_presence_rate": 1.0,
+  "citation_validity_rate": 1.0,
+  "avg_latency_s": 11.266,
+  "details": [
+    {
+      "id": "Q01",
+      "question": "What chemical reactions occur during the initial stage of thermal runaway?",
+      "expected_doc_id": "KB-01",
+      "retrieved_doc_ids": [
+        "KB-01",
+        "KB-01",
+        "KB-01",
+        "KB-02"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-01-C2",
+        "KB-01-C4"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.95,
+      "latency_s": 5.167
+    },
+    {
+      "id": "Q02",
+      "question": "Why does doubling the electric current quadruple the Joule heating in battery cells?",
+      "expected_doc_id": "KB-02",
+      "retrieved_doc_ids": [
+        "KB-02",
+        "KB-02",
+        "KB-02",
+        "KB-05"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-02-C2",
+        "KB-02-C3"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.98,
+      "latency_s": 0.499
+    },
+    {
+      "id": "Q03",
+      "question": "What happens to the copper current collectors when cell voltage drops below 2.5V?",
+      "expected_doc_id": "KB-03",
+      "retrieved_doc_ids": [
+        "KB-03",
+        "KB-02",
+        "KB-08",
+        "KB-07"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-03-C2",
+        "KB-07-C3"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.98,
+      "latency_s": 0.513
+    },
+    {
+      "id": "Q04",
+      "question": "What are the safe operating temperature limits and critical cutoff thresholds for lithium-ion cells?",
+      "expected_doc_id": "KB-03",
+      "retrieved_doc_ids": [
+        "KB-03",
+        "KB-03",
+        "KB-01",
+        "KB-04"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-03-C2",
+        "KB-03-C3",
+        "KB-04-C2"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.98,
+      "latency_s": 0.929
+    },
+    {
+      "id": "Q05",
+      "question": "What is the tiered fault response ladder followed by the battery management system?",
+      "expected_doc_id": "KB-04",
+      "retrieved_doc_ids": [
+        "KB-04",
+        "KB-04",
+        "KB-04",
+        "KB-07"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-04-C3"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.95,
+      "latency_s": 11.896
+    },
+    {
+      "id": "Q06",
+      "question": "How does the CC-CV charging protocol operate and when does current decay?",
+      "expected_doc_id": "KB-05",
+      "retrieved_doc_ids": [
+        "KB-05",
+        "KB-06",
+        "KB-05",
+        "KB-06"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-05-C2",
+        "KB-06-C4"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.98,
+      "latency_s": 20.886
+    },
+    {
+      "id": "Q07",
+      "question": "Why does DC fast charging at cold temperatures below freezing risk lithium plating?",
+      "expected_doc_id": "KB-05",
+      "retrieved_doc_ids": [
+        "KB-05",
+        "KB-03",
+        "KB-01",
+        "KB-01"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-03-C3",
+        "KB-05-C3"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.95,
+      "latency_s": 14.725
+    },
+    {
+      "id": "Q08",
+      "question": "What causes sensor drift and cumulative error in Coulomb counting SOC estimation?",
+      "expected_doc_id": "KB-06",
+      "retrieved_doc_ids": [
+        "KB-06",
+        "KB-06",
+        "KB-06",
+        "KB-09"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-06-C3",
+        "KB-09-C2"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.95,
+      "latency_s": 8.704
+    },
+    {
+      "id": "Q09",
+      "question": "How does the BMS recalibrate state of charge using open circuit voltage lookup?",
+      "expected_doc_id": "KB-06",
+      "retrieved_doc_ids": [
+        "KB-06",
+        "KB-04",
+        "KB-04",
+        "KB-04"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-04-C2",
+        "KB-06-C4"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.95,
+      "latency_s": 9.626
+    },
+    {
+      "id": "Q10",
+      "question": "What are the primary aging mechanisms causing SEI growth and loss of active material?",
+      "expected_doc_id": "KB-07",
+      "retrieved_doc_ids": [
+        "KB-07",
+        "KB-07",
+        "KB-01",
+        "KB-01"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-07-C3"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.98,
+      "latency_s": 10.649
+    },
+    {
+      "id": "Q11",
+      "question": "When is an electric vehicle traction battery considered to reach end of life criteria?",
+      "expected_doc_id": "KB-07",
+      "retrieved_doc_ids": [
+        "KB-07",
+        "KB-07",
+        "KB-12",
+        "KB-10"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-07-C2"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.95,
+      "latency_s": 12.496
+    },
+    {
+      "id": "Q12",
+      "question": "What are the earliest telemetry signatures that indicate an internal short circuit in a cell?",
+      "expected_doc_id": "KB-08",
+      "retrieved_doc_ids": [
+        "KB-08",
+        "KB-08",
+        "KB-08",
+        "KB-09"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-08-C3",
+        "KB-09-C3"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.95,
+      "latency_s": 10.749
+    },
+    {
+      "id": "Q13",
+      "question": "How can you detect a stuck or flat-lined temperature sensor during battery cycling?",
+      "expected_doc_id": "KB-09",
+      "retrieved_doc_ids": [
+        "KB-09",
+        "KB-09",
+        "KB-01",
+        "KB-04"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-09-C2",
+        "KB-09-C3"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.95,
+      "latency_s": 15.768
+    },
+    {
+      "id": "Q14",
+      "question": "What physical tests and megohmmeter measurements are conducted during high voltage pack inspection?",
+      "expected_doc_id": "KB-10",
+      "retrieved_doc_ids": [
+        "KB-10",
+        "KB-10",
+        "KB-15",
+        "KB-12"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-10-C4"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.95,
+      "latency_s": 10.751
+    },
+    {
+      "id": "Q15",
+      "question": "How does direct dielectric immersion cooling compare to indirect liquid cold plate cooling?",
+      "expected_doc_id": "KB-11",
+      "retrieved_doc_ids": [
+        "KB-11",
+        "KB-11",
+        "KB-11",
+        "KB-03"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-11-C2",
+        "KB-11-C3"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.95,
+      "latency_s": 15.361
+    },
+    {
+      "id": "Q16",
+      "question": "What are the 5 weighted components and component weights in the Guardian deterministic risk engine?",
+      "expected_doc_id": "KB-12",
+      "retrieved_doc_ids": [
+        "KB-12",
+        "KB-12",
+        "KB-15",
+        "KB-14"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-12-C2"
+      ],
+      "citations_valid": true,
+      "confidence_score": 1.0,
+      "latency_s": 17.921
+    },
+    {
+      "id": "Q17",
+      "question": "What hard safety overrides immediately force the Guardian risk level to CRITICAL or at least HIGH?",
+      "expected_doc_id": "KB-12",
+      "retrieved_doc_ids": [
+        "KB-15",
+        "KB-12",
+        "KB-12",
+        "KB-04"
+      ],
+      "top_1_hit": false,
+      "top_k_hit": true,
+      "citations": [
+        "KB-04-C3",
+        "KB-12-C3",
+        "KB-15-C2"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.98,
+      "latency_s": 20.888
+    },
+    {
+      "id": "Q18",
+      "question": "How does the Guardian Beta-VAE compute anomaly scores using the empirical CDF of validation errors?",
+      "expected_doc_id": "KB-13",
+      "retrieved_doc_ids": [
+        "KB-13",
+        "KB-13",
+        "KB-13",
+        "KB-12"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-13-C2",
+        "KB-13-C4"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.98,
+      "latency_s": 15.873
+    },
+    {
+      "id": "Q19",
+      "question": "How many steps ahead does the Guardian LightGBM temperature predictor forecast?",
+      "expected_doc_id": "KB-14",
+      "retrieved_doc_ids": [
+        "KB-14",
+        "KB-14",
+        "KB-14",
+        "KB-12"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-14-C2"
+      ],
+      "citations_valid": true,
+      "confidence_score": 1.0,
+      "latency_s": 17.388
+    },
+    {
+      "id": "Q20",
+      "question": "Why does the Guardian event monitor use a 15-second debounce window with escalation bypass?",
+      "expected_doc_id": "KB-15",
+      "retrieved_doc_ids": [
+        "KB-15",
+        "KB-15",
+        "KB-15",
+        "KB-13"
+      ],
+      "top_1_hit": true,
+      "top_k_hit": true,
+      "citations": [
+        "KB-15-C3"
+      ],
+      "citations_valid": true,
+      "confidence_score": 0.98,
+      "latency_s": 4.523
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "dataset_size_real": 19758,
+  "synthetic_samples_per_class": 200,
+  "two_sample_classifier_auc": 1.0,
+  "fidelity_mean_abs_diff": {
+    "thermal_ramp": 18.1042,
+    "current_spike": 0.9332,
+    "voltage_sag": 31.6254
+  },
+  "fidelity_std_abs_diff": {
+    "thermal_ramp": 17.1319,
+    "current_spike": 2.0016,
+    "voltage_sag": 0.706
+  },
+  "diversity_scores": {
+    "thermal_ramp": 56.3949,
+    "current_spike": 59.8345,
+    "voltage_sag": 4.6295
+  },
+  "utility": {
+    "vae_warning_threshold": 1.547,
+    "detection_rates": {
+      "thermal_ramp": 1.0,
+      "current_spike": 1.0,
+      "voltage_sag": 1.0
+    },
+    "overall_detection_rate": 1.0
+  },
+  "figure_path": "artifacts\\figures\\gan_synthetic_overlay.png",
+  "note": "All GAN data is synthetically generated for threshold stress-testing and anomaly evaluation."
+}

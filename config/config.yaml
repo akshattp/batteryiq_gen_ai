@@ -1,0 +1,127 @@
+# AI Battery Safety Guardian - Configuration
+# All thresholds, paths, hyperparameters, and feature flags live here.
+
+seed: 42
+
+features:
+  gan: true       # Conditional GAN for synthetic fault windows (Tier C)
+  bert: true      # Fine-tuned incident classifier (Tier C)
+  lora: true      # Fine-tuned LoRA safety explainer (Tier C)
+
+paths:
+  data_raw: "data/raw"
+  data_interim: "data/interim"
+  data_processed: "data/processed"
+  kb_dir: "data/kb"
+  incidents_file: "data/incidents/incident_reports.csv"
+  models_dir: "artifacts/models"
+  metrics_dir: "artifacts/metrics"
+  figures_dir: "artifacts/figures"
+  index_dir: "artifacts/index"
+  llm_cache: "artifacts/llm_cache"
+  autoheal_log: "reports/autoheal/log.jsonl"
+
+data:
+  resample_s: null          # null = keep native recording step
+  v_min: 2.0                # Minimum physical voltage (V)
+  v_max: 4.5                # Maximum physical voltage (V)
+  temp_min: -20.0           # Minimum physical temp (°C)
+  temp_max: 80.0            # Maximum physical temp (°C)
+  current_abs_max: 50.0     # Maximum absolute current (A)
+  window_size: 30           # Sliding window length W (steps)
+  window_stride: 5          # Sliding window stride (steps)
+  train_batteries: ["B0005", "B0006", "B0007"]
+  test_battery: "B0018"
+  default_ambient_c: 24.0
+
+vae:
+  hidden_dims: [128, 64]
+  latent_dim: 8
+  beta: 0.5                 # Beta-VAE regularisation factor
+  lr: 0.001
+  epochs: 30
+  batch_size: 64
+  early_stopping_patience: 5
+  thresholds:
+    warning_percentile: 95.0
+    critical_percentile: 99.5
+
+temp_predictor:
+  horizon_steps: 10         # Predict T at t + 10 steps
+  lags: [1, 5, 10]
+  learning_rate: 0.05
+  n_estimators: 150
+  max_depth: 6
+
+gan:
+  latent_dim: 32
+  hidden_dim: 128
+  batch_size: 64
+  lr: 0.0002
+  epochs: 15
+  num_classes: 3
+
+bert:
+  model_name: "distilbert-base-uncased"
+  max_length: 64
+  batch_size: 16
+  epochs: 3
+  learning_rate: 0.00002
+  smoke_samples: 50
+
+lora:
+  base_model: "Qwen/Qwen2.5-0.5B-Instruct"
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  smoke_samples: 20
+  smoke_steps: 5
+
+risk:
+  weights:
+    temp: 0.30
+    temp_trend: 0.20
+    current: 0.15
+    voltage: 0.10
+    anomaly: 0.25
+  thresholds:
+    t_warn: 35.0            # °C
+    t_high: 42.0            # °C
+    t_crit: 50.0            # °C
+    dtdt_crit: 3.0          # °C/min
+    i_rated: 2.0            # A rated continuous current
+    v_min: 2.5              # V operating lower bound
+    v_max: 4.2              # V operating upper bound
+  levels:
+    normal_max: 30.0        # < 30 NORMAL
+    warning_max: 55.0       # 30-55 WARNING
+    high_max: 75.0          # 55-75 HIGH, >= 75 CRITICAL
+
+events:
+  min_gap_s: 15.0           # Debounce threshold in seconds
+
+llm:
+  provider: "groq"          # groq | template | local_hf | openai | anthropic
+  model: "qwen/qwen3.8-27b"
+  fallback_model: "openai/gpt-oss-20b"
+  temperature: 0.2
+  max_tokens: 500
+  forbidden_phrases:
+    - "shut down"
+    - "shutdown"
+    - "disconnect"
+    - "emergency stop"
+    - "disable bms"
+    - "ignore"
+    - "override safety"
+
+rag:
+  chunk_size: 400
+  chunk_overlap: 50
+  top_k: 4
+  embed_model: "all-MiniLM-L6-v2"
+  min_similarity: 0.3
+
+codeexec:
+  timeout_s: 5
+  max_heal_attempts: 3
