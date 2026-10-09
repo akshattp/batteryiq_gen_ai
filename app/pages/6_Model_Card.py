@@ -2,36 +2,38 @@
 
 from __future__ import annotations
 
+import sys
+import importlib
 from pathlib import Path
 import streamlit as st
 
+if "app.ui_theme" in sys.modules:
+    importlib.reload(sys.modules["app.ui_theme"])
+else:
+    import app.ui_theme
+from app.ui_theme import inject_theme, render_header, render_footer
+
 st.set_page_config(page_title="Model Card | Guardian", page_icon="📑", layout="wide")
 
-st.markdown(
-    """
-    <style>
-    .footer-guard {
-        margin-top: 50px;
-        padding: 14px;
-        background-color: #161b22;
-        border-top: 1px solid #30363d;
-        text-align: center;
-        font-size: 0.85rem;
-        color: #8b949e;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
+render_header(
+    title="AI Model Card & System Governance",
+    subtitle="Standardized Architecture Specifications, Evaluation Benchmarks, Training Protocols & Safety Boundaries",
+    badge_text="GOVERNANCE AUDIT",
+    tag="REPORT 06",
 )
-
-st.title("📑 AI Model Card & Architecture Specifications")
-st.caption("Standardized model documentation covering model architectures, training protocols, evaluation metrics, and safety boundaries.")
 
 card_path = Path("reports/MODEL_CARD.md")
 if card_path.exists():
     with open(card_path, "r", encoding="utf-8") as f:
         content = f.read()
+    st.markdown(
+        f"""
+        <div class="angular-card" style="padding: 24px 32px;">
+        """,
+        unsafe_allow_html=True,
+    )
     st.markdown(content)
+    st.markdown("</div>", unsafe_allow_html=True)
 else:
     st.info("Generating Model Card from current model artifacts...")
     st.markdown(
@@ -49,8 +51,4 @@ else:
         """
     )
 
-st.markdown("---")
-st.markdown(
-    '<div class="footer-guard">⚠️ <strong>Decision-support prototype. Not for vehicle control.</strong></div>',
-    unsafe_allow_html=True,
-)
+render_footer()

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import sys
+import importlib
 from pathlib import Path
 
 import numpy as np
@@ -15,31 +17,20 @@ from guardian.risk.engine import assess
 from guardian.risk.events import detect_events
 from guardian.risk.recommend import recommend_actions
 
+if "app.ui_theme" in sys.modules:
+    importlib.reload(sys.modules["app.ui_theme"])
+else:
+    import app.ui_theme
+from app.ui_theme import inject_theme, render_header, render_footer
+
 st.set_page_config(page_title="Safety Events | Guardian", page_icon="🚨", layout="wide")
 
-st.markdown(
-    """
-    <style>
-    .footer-guard {
-        margin-top: 50px;
-        padding: 14px;
-        background-color: #161b22;
-        border-top: 1px solid #30363d;
-        text-align: center;
-        font-size: 0.85rem;
-        color: #8b949e;
-    }
-    .badge-normal { background-color: #0e4429; color: #3fb950; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
-    .badge-warning { background-color: #4d3800; color: #d29922; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
-    .badge-high { background-color: #5a1e02; color: #f0883e; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
-    .badge-critical { background-color: #5c1414; color: #f85149; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
-    </style>
-    """,
-    unsafe_allow_html=True,
+render_header(
+    title="Debounced Safety Events & Drill-Down",
+    subtitle="Inspect Multi-Tier Threshold Violations, Rapid Severity Escalations & Grounded GenAI Diagnostics",
+    badge_text="SAFETY MONITOR",
+    tag="WORKBENCH 02",
 )
-
-st.title("🚨 Debounced Safety Events & Drill-Down")
-st.caption("Inspect detected safety threshold events, debounced advisories, and grounded LLM explanations.")
 
 
 @st.cache_data
@@ -119,8 +110,8 @@ with col_sel2:
 
 sub_df, events = get_session_events(sel_bat, sel_cycle)
 
-st.markdown("---")
-st.subheader(f"📋 Detected Safety Events ({len(events)} Total)")
+st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+st.header(f"📋 Detected Safety Events ({len(events)} Total)")
 
 if not events:
     st.success("✅ No abnormal safety events detected in this session cycle. All operating parameters remained within nominal ranges.")
@@ -144,31 +135,36 @@ else:
     selected_idx = st.selectbox("Select Event for Detailed Diagnostic Drill-Down", range(len(events)), format_func=lambda x: f"Event #{x} ({events[x].event_id} at t={events[x].t_s:.1f}s)")
     ev = events[selected_idx]
 
-    st.markdown("---")
-    st.subheader(f"🔍 Event Inspection: {ev.event_id}")
+    st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+    st.header(f"🔍 Event Inspection: {ev.event_id}")
 
     lvl_str = ev.risk_level.value if hasattr(ev.risk_level, "value") else str(ev.risk_level)
-    badge = f"badge-{lvl_str.lower()}"
+    if lvl_str.lower() == "critical":
+        badge = '<span class="chip chip-danger"><span class="chip-pulse"></span> CRITICAL</span>'
+    elif lvl_str.lower() in ("high", "warning"):
+        badge = f'<span class="chip chip-warning">{lvl_str.upper()}</span>'
+    else:
+        badge = f'<span class="chip chip-success">{lvl_str.upper()}</span>'
 
     p1, p2, p3 = st.columns(3)
-    p1.markdown(f"**Severity Level:** <span class='{badge}'>{lvl_str}</span>", unsafe_allow_html=True)
+    p1.markdown(f"**Severity Level:** {badge}", unsafe_allow_html=True)
     p2.metric("Risk Score", f"{ev.risk_score:.1f}")
     p3.metric("Timestamp", f"{ev.t_s:.1f} s")
 
     col_diag, col_llm = st.columns([1, 1])
 
     with col_diag:
-        st.markdown("#### 1. Why Was This Detected?")
+        st.subheader("1. Why Was This Detected?")
         for r in ev.reasons:
             st.error(f"• {r}")
 
-        st.markdown("#### 2. What Does the Model Recommend?")
+        st.subheader("2. What Does the Model Recommend?")
         recs = recommend_actions(ev.assessment)
         for act in recs:
             st.info(f"👉 {act}")
 
     with col_llm:
-        st.markdown("#### 3. Validated GenAI Diagnostic Explanation")
+        st.subheader("3. Validated GenAI Diagnostic Explanation")
         
         # Build structured input dict
         assessment_dict = {
@@ -209,8 +205,4 @@ else:
         st.session_state["prefill_chat_query"] = f"Explain what caused {ev.event_id} at t={ev.t_s:.1f}s and why risk score was {ev.risk_score:.1f}."
         st.info("Query queued. Navigate to the 'Ask Guardian' tab to continue.")
 
-st.markdown("---")
-st.markdown(
-    '<div class="footer-guard">⚠️ <strong>Decision-support prototype. Not for vehicle control.</strong></div>',
-    unsafe_allow_html=True,
-)
+render_footer()

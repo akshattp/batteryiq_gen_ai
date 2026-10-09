@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import sys
+import importlib
 from pathlib import Path
 import numpy as np
 import plotly.express as px
@@ -12,36 +14,20 @@ from guardian.genai.rag import RAGPipeline
 from guardian.models.bert_incident import IncidentClassifier
 from guardian.models.gan import TelemetryGenerator
 
+if "app.ui_theme" in sys.modules:
+    importlib.reload(sys.modules["app.ui_theme"])
+else:
+    import app.ui_theme
+from app.ui_theme import inject_theme, render_header, render_footer
+
 st.set_page_config(page_title="Incident Reports | Guardian", page_icon="📋", layout="wide")
 
-st.markdown(
-    """
-    <style>
-    .footer-guard {
-        margin-top: 50px;
-        padding: 14px;
-        background-color: #161b22;
-        border-top: 1px solid #30363d;
-        text-align: center;
-        font-size: 0.85rem;
-        color: #8b949e;
-    }
-    .badge-category {
-        background-color: #1f6feb;
-        color: #ffffff;
-        padding: 6px 14px;
-        border-radius: 6px;
-        font-weight: 700;
-        font-size: 1.1rem;
-        display: inline-block;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
+render_header(
+    title="Incident Report Triage & Fault Synthesis",
+    subtitle="DistilBERT Unstructured Note Classification (5 Failure Taxonomies) & Conditional GAN Scenario Window Synthesis",
+    badge_text="NLP & GAN ENSEMBLE",
+    tag="WORKBENCH 05",
 )
-
-st.title("📋 Incident Report Triage & Synthetic Scenarios")
-st.caption("Classify unstructured field technician notes using DistilBERT and generate synthetic fault scenarios via conditional GAN.")
 
 
 @st.cache_resource
@@ -96,7 +82,7 @@ with tab_triage:
             c1, c2 = st.columns([1, 1])
             with c1:
                 st.markdown(f"**Predicted Taxonomy Category:**")
-                st.markdown(f"<span class='badge-category'>{cat.upper()}</span>", unsafe_allow_html=True)
+                st.markdown(f"<span class='chip chip-info' style='font-size: 0.88rem; padding: 6px 14px;'>{cat.upper()}</span>", unsafe_allow_html=True)
                 st.metric("Confidence Score", f"{conf*100:.1f} %")
                 
                 # Probability distribution chart
@@ -108,13 +94,13 @@ with tab_triage:
                     labels={"x": "Probability", "y": "Category"},
                     title="Class Probability Distribution",
                     color=[p[1] for p in prob_df],
-                    color_continuous_scale="Blues",
+                    color_continuous_scale=[[0.0, "#004E9B"], [0.5, "#0091B9"], [1.0, "#BAE4F0"]],
                 )
-                fig_prob.update_layout(template="plotly_dark", height=240, margin=dict(l=20, r=20, t=30, b=20))
+                fig_prob.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=240, margin=dict(l=20, r=20, t=30, b=20))
                 st.plotly_chart(fig_prob, use_container_width=True)
 
             with c2:
-                st.markdown("#### Relevant Knowledge Base SOPs & Passages")
+                st.subheader("Relevant Knowledge Base SOPs & Passages")
                 rag = get_rag_pipeline()
                 kb_results = rag.retrieve(f"{cat} {note_text}", top_k=3)
                 for res in kb_results:
@@ -156,15 +142,12 @@ with tab_gan:
                 y=syn_window[:, 2],  # temp feature
                 labels={"x": "Window Time Step (W=30)", "y": "Normalized Value"},
                 title=f"Synthetic Telemetry Window ({fault_type.upper()})",
+                color_discrete_sequence=["#0091B9"],
             )
-            fig_syn.update_layout(template="plotly_dark", height=320)
+            fig_syn.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=320)
             st.plotly_chart(fig_syn, use_container_width=True)
             st.success(f"Generated realistic {fault_type} window (30 steps x 12 features) passing VAE anomaly checks.")
         else:
             st.info("GAN model artifact not found. Please train via `python scripts/train_gan.py`.")
 
-st.markdown("---")
-st.markdown(
-    '<div class="footer-guard">⚠️ <strong>Decision-support prototype. Not for vehicle control.</strong></div>',
-    unsafe_allow_html=True,
-)
+render_footer()

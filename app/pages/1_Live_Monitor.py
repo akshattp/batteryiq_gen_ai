@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import sys
+import importlib
 from pathlib import Path
 from typing import Optional
 
@@ -13,32 +15,20 @@ import streamlit as st
 
 from guardian.risk.engine import assess
 from guardian.risk.events import detect_events
+if "app.ui_theme" in sys.modules:
+    importlib.reload(sys.modules["app.ui_theme"])
+else:
+    import app.ui_theme
+from app.ui_theme import inject_theme, render_header, render_footer, make_gauge_chart
 
 st.set_page_config(page_title="Live Monitor | Guardian", page_icon="📈", layout="wide")
 
-st.markdown(
-    """
-    <style>
-    .footer-guard {
-        margin-top: 50px;
-        padding: 14px;
-        background-color: #161b22;
-        border-top: 1px solid #30363d;
-        text-align: center;
-        font-size: 0.85rem;
-        color: #8b949e;
-    }
-    .badge-normal { background-color: #0e4429; color: #3fb950; padding: 4px 12px; border-radius: 6px; font-weight: bold; }
-    .badge-warning { background-color: #4d3800; color: #d29922; padding: 4px 12px; border-radius: 6px; font-weight: bold; }
-    .badge-high { background-color: #5a1e02; color: #f0883e; padding: 4px 12px; border-radius: 6px; font-weight: bold; }
-    .badge-critical { background-color: #5c1414; color: #f85149; padding: 4px 12px; border-radius: 6px; font-weight: bold; }
-    </style>
-    """,
-    unsafe_allow_html=True,
+render_header(
+    title="Live Telemetry Monitor & Assessment",
+    subtitle="Replay High-Frequency NASA Battery Discharge Telemetry and Track Forward Thermal Horizons",
+    badge_text="TELEMETRY ACTIVE",
+    tag="WORKBENCH 01",
 )
-
-st.title("📈 Live Telemetry Monitor & Assessment")
-st.caption("Replay NASA battery telemetry and observe real-time AI risk scoring.")
 
 
 @st.cache_data
@@ -125,39 +115,136 @@ assessment = assess(
 level_str = assessment.risk_level.value if hasattr(assessment.risk_level, "value") else str(assessment.risk_level)
 badge_class = f"badge-{level_str.lower()}"
 
-# 3. Top AI Assessment Card
-st.subheader("🤖 AI Real-Time Risk Assessment")
-a_col1, a_col2, a_col3, a_col4 = st.columns(4)
+# 3. Top AI Assessment Card (Angular Layout with Plotly Risk Gauge)
+st.header("🤖 AI Real-Time Risk Assessment")
 
-with a_col1:
-    st.markdown(f"**Risk Level:** <span class='{badge_class}'>{level_str}</span>", unsafe_allow_html=True)
-with a_col2:
-    st.metric("Risk Score (0–100)", f"{assessment.risk_score:.1f}")
-with a_col3:
-    st.metric("Anomaly Score", f"{anomaly_score:.3f}", delta=f"{'ABOVE' if anomaly_score > 0.4 else 'NOMINAL'}")
-with a_col4:
-    st.metric("Predicted Temp (t+10)", f"{pred_temp:.1f} °C")
+col_gauge, col_info = st.columns([1, 2])
+
+with col_gauge:
+    fig_gauge = make_gauge_chart(assessment.risk_score, "DETERMINISTIC RISK SCORE")
+    st.plotly_chart(fig_gauge, use_container_width=True)
+
+with col_info:
+    # Determine chip class
+    if level_str.lower() == "critical":
+        chip_html = f'<span class="chip chip-danger"><span class="chip-pulse"></span> {level_str} SEVERITY</span>'
+    elif level_str.lower() == "high":
+        chip_html = f'<span class="chip chip-warning">{level_str} ELEVATED</span>'
+    elif level_str.lower() == "warning":
+        chip_html = f'<span class="chip chip-warning">{level_str} ADVISORY</span>'
+    else:
+        chip_html = f'<span class="chip chip-success"><span class="chip-pulse"></span> {level_str} NOMINAL</span>'
+
+    st.markdown(
+        f"""
+        <div class="angular-card" style="padding: 16px 20px; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span style="font-weight: 700; font-size: 0.9rem; color: #004E9B;">MONITORED STATUS</span>
+                {chip_html}
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                <div style="background: #EAF4F9; border: 1px solid rgba(0, 145, 185, 0.25); padding: 10px; border-radius: 8px;">
+                    <div style="font-size: 0.72rem; color: #004E9B; text-transform: uppercase; font-weight: 600;">Latent Anomaly</div>
+                    <div style="font-size: 1.25rem; font-weight: 700; color: #8C5B00; font-family: 'JetBrains Mono';">{anomaly_score:.3f}</div>
+                    <div style="font-size: 0.7rem; color: {'#FF6500' if anomaly_score > 0.4 else '#0091B9'}; font-weight: 600;">{'&uarr; ELEVATED' if anomaly_score > 0.4 else '&bull; NOMINAL'}</div>
+                </div>
+                <div style="background: #EAF4F9; border: 1px solid rgba(0, 145, 185, 0.25); padding: 10px; border-radius: 8px;">
+                    <div style="font-size: 0.72rem; color: #004E9B; text-transform: uppercase; font-weight: 600;">Forecast Horizon (t+10)</div>
+                    <div style="font-size: 1.25rem; font-weight: 700; color: #0091B9; font-family: 'JetBrains Mono';">{pred_temp:.1f} °C</div>
+                    <div style="font-size: 0.7rem; color: #486581;">LightGBM Horizon</div>
+                </div>
+                <div style="background: #EAF4F9; border: 1px solid rgba(0, 145, 185, 0.25); padding: 10px; border-radius: 8px;">
+                    <div style="font-size: 0.72rem; color: #004E9B; text-transform: uppercase; font-weight: 600;">Hard Overrides</div>
+                    <div style="font-size: 1.25rem; font-weight: 700; color: {'#FF6500' if assessment.hard_overrides else '#004E9B'}; font-family: 'JetBrains Mono';">{len(assessment.hard_overrides)} Active</div>
+                    <div style="font-size: 0.7rem; color: #486581;">Deterministic Safe Guard</div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 if assessment.hard_overrides:
     for h in assessment.hard_overrides:
-        st.warning(f"🚨 **Hard Override Active:** {h}")
+        st.error(f"🚨 **HARD OVERRIDE ENFORCED:** {h}")
 
-st.markdown("---")
+st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 
-# 4. Telemetry KPI Cards
-st.subheader("📊 Cell Operating State")
+# 4. Telemetry KPI Cards (Angular Stat Tiles)
+st.header("📊 Cell Operating State")
 k1, k2, k3, k4, k5, k6 = st.columns(6)
-k1.metric("Temperature", f"{current_row.get('temp_c', 0.0):.1f} °C")
-k2.metric("Voltage", f"{current_row.get('voltage_v', 0.0):.3f} V")
-k3.metric("Current", f"{current_row.get('current_a', 0.0):.2f} A")
-k4.metric("SOC", f"{current_row.get('soc_pct', 0.0):.1f} %")
-k5.metric("Cycle", f"{int(current_row.get('cycle', 1))}")
-k6.metric("SOH", f"{current_row.get('soh_pct', 90.0):.1f} %")
 
-st.markdown("---")
+with k1:
+    st.markdown(
+        f"""
+        <div class="stat-tile" style="border-left: 4px solid #FF6500;">
+            <div class="stat-tile-label">🌡️ Temperature</div>
+            <div class="stat-tile-val">{current_row.get('temp_c', 0.0):.1f}°C</div>
+            <div class="stat-tile-sub">Ambient: {current_row.get('ambient_c', 24.0):.1f}°C</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+with k2:
+    st.markdown(
+        f"""
+        <div class="stat-tile" style="border-left: 4px solid #004E9B;">
+            <div class="stat-tile-label">⚡ Voltage</div>
+            <div class="stat-tile-val">{current_row.get('voltage_v', 0.0):.3f}V</div>
+            <div class="stat-tile-sub">Range: 2.5 - 4.2V</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+with k3:
+    st.markdown(
+        f"""
+        <div class="stat-tile" style="border-left: 4px solid #0091B9;">
+            <div class="stat-tile-label">🔌 Current</div>
+            <div class="stat-tile-val">{current_row.get('current_a', 0.0):.2f}A</div>
+            <div class="stat-tile-sub">Rated: 2.00A</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+with k4:
+    st.markdown(
+        f"""
+        <div class="stat-tile" style="border-left: 4px solid #FFD500;">
+            <div class="stat-tile-label" style="color: #8C5B00;">🔋 State of Charge</div>
+            <div class="stat-tile-val">{current_row.get('soc_pct', 0.0):.1f}%</div>
+            <div class="stat-tile-sub">Discharge Active</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+with k5:
+    st.markdown(
+        f"""
+        <div class="stat-tile" style="border-left: 4px solid #0091B9;">
+            <div class="stat-tile-label">🔄 Discharge Cycle</div>
+            <div class="stat-tile-val">#{int(current_row.get('cycle', 1))}</div>
+            <div class="stat-tile-sub">Cell: {selected_bat}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+with k6:
+    st.markdown(
+        f"""
+        <div class="stat-tile" style="border-left: 4px solid #004E9B;">
+            <div class="stat-tile-label">🛡️ State of Health</div>
+            <div class="stat-tile-val">{current_row.get('soh_pct', 90.0):.1f}%</div>
+            <div class="stat-tile-sub">Remaining Cap: Nominal</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-# 5. Six Synchronized Charts (Optimized downsampling for instant client-side rendering)
-st.subheader("📈 Telemetry Time Series (Current Replay Point Marked)")
+st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+
+# 5. Six Synchronized Charts (Palette-mapped with light theme high readability)
+st.header("📈 Telemetry Time Series (Current Replay Point Marked)")
 
 t_curr = current_row["t_s"]
 
@@ -168,56 +255,60 @@ plot_df = session_df.iloc[::plot_step].copy()
 c1, c2 = st.columns(2)
 
 with c1:
-    # 1. Temp chart
-    fig_temp = px.line(plot_df, x="t_s", y="temp_c", title="Cell Temperature (°C)", color_discrete_sequence=["#f85149"])
-    fig_temp.add_vline(x=t_curr, line_dash="dash", line_color="#ffffff", annotation_text="t_now")
-    fig_temp.add_hline(y=35.0, line_dash="dot", line_color="#d29922", annotation_text="Warn (35°C)")
-    fig_temp.add_hline(y=50.0, line_dash="dot", line_color="#f85149", annotation_text="Crit (50°C)")
-    fig_temp.update_layout(template="plotly_dark", height=280, margin=dict(l=20, r=20, t=40, b=20))
+    # 1. Temp chart (#FF6500 Safety Orange)
+    fig_temp = px.area(plot_df, x="t_s", y="temp_c", title="Cell Skin Temperature (°C)", color_discrete_sequence=["#FF6500"])
+    fig_temp.add_vline(x=t_curr, line_dash="dash", line_color="#002B5B", annotation_text="t_now")
+    fig_temp.add_hline(y=35.0, line_dash="dot", line_color="#FFD500", annotation_text="Warn (35°C)")
+    fig_temp.add_hline(y=50.0, line_dash="dot", line_color="#FF6500", annotation_text="Crit (50°C)")
+    fig_temp.update_traces(fillcolor="rgba(255, 101, 0, 0.12)")
+    fig_temp.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=280, margin=dict(l=20, r=20, t=40, b=20), hovermode="x unified")
     st.plotly_chart(fig_temp, use_container_width=True)
 
-    # 2. Current chart
-    fig_curr = px.line(plot_df, x="t_s", y="current_a", title="Discharge Current (A)", color_discrete_sequence=["#58a6ff"])
-    fig_curr.add_vline(x=t_curr, line_dash="dash", line_color="#ffffff")
-    fig_curr.add_hline(y=2.0, line_dash="dot", line_color="#d29922", annotation_text="Rated (2.0A)")
-    fig_curr.update_layout(template="plotly_dark", height=280, margin=dict(l=20, r=20, t=40, b=20))
+    # 2. Current chart (#0091B9 Cerulean Teal)
+    fig_curr = px.area(plot_df, x="t_s", y="current_a", title="Discharge Current (A)", color_discrete_sequence=["#0091B9"])
+    fig_curr.add_vline(x=t_curr, line_dash="dash", line_color="#002B5B")
+    fig_curr.add_hline(y=2.0, line_dash="dot", line_color="#FFD500", annotation_text="Rated (2.0A)")
+    fig_curr.update_traces(fillcolor="rgba(0, 145, 185, 0.12)")
+    fig_curr.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=280, margin=dict(l=20, r=20, t=40, b=20), hovermode="x unified")
     st.plotly_chart(fig_curr, use_container_width=True)
 
-    # 3. Anomaly score chart (Vectorized numpy computation)
+    # 3. Anomaly score chart (#8C5B00 Warning Yellow)
     plot_anom = np.clip((plot_df["temp_c"].values - 24.0) / 30.0, 0.05, 0.95)
     fig_anom = go.Figure()
-    fig_anom.add_trace(go.Scatter(x=plot_df["t_s"], y=plot_anom, mode="lines", name="Anomaly Score", line=dict(color="#bc8cff")))
-    fig_anom.add_hline(y=0.45, line_dash="dash", line_color="#d29922", annotation_text="Threshold (0.45)")
-    fig_anom.add_vline(x=t_curr, line_dash="dash", line_color="#ffffff")
-    fig_anom.update_layout(title="Beta-VAE Anomaly Score", template="plotly_dark", height=280, margin=dict(l=20, r=20, t=40, b=20))
+    fig_anom.add_trace(go.Scatter(x=plot_df["t_s"], y=plot_anom, mode="lines", fill="tozeroy", name="Anomaly Score", line=dict(color="#FFD500", width=2), fillcolor="rgba(255, 213, 0, 0.18)"))
+    fig_anom.add_hline(y=0.45, line_dash="dash", line_color="#FF6500", annotation_text="Threshold (0.45)")
+    fig_anom.add_vline(x=t_curr, line_dash="dash", line_color="#002B5B")
+    fig_anom.update_layout(title="Beta-VAE Reconstruction Loss Anomaly Score", template="plotly_white", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=280, margin=dict(l=20, r=20, t=40, b=20), hovermode="x unified")
     st.plotly_chart(fig_anom, use_container_width=True)
 
 with c2:
-    # 4. Voltage chart
-    fig_v = px.line(plot_df, x="t_s", y="voltage_v", title="Terminal Voltage (V)", color_discrete_sequence=["#3fb950"])
-    fig_v.add_vline(x=t_curr, line_dash="dash", line_color="#ffffff")
-    fig_v.add_hline(y=2.5, line_dash="dot", line_color="#f85149", annotation_text="Min (2.5V)")
-    fig_v.update_layout(template="plotly_dark", height=280, margin=dict(l=20, r=20, t=40, b=20))
+    # 4. Voltage chart (#004E9B Deep Navy)
+    fig_v = px.area(plot_df, x="t_s", y="voltage_v", title="Terminal Voltage (V)", color_discrete_sequence=["#004E9B"])
+    fig_v.add_vline(x=t_curr, line_dash="dash", line_color="#002B5B")
+    fig_v.add_hline(y=2.5, line_dash="dot", line_color="#FF6500", annotation_text="Min Cutoff (2.5V)")
+    fig_v.update_traces(fillcolor="rgba(0, 78, 155, 0.10)")
+    fig_v.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=280, margin=dict(l=20, r=20, t=40, b=20), hovermode="x unified")
     st.plotly_chart(fig_v, use_container_width=True)
 
-    # 5. SOC chart
-    fig_soc = px.line(plot_df, x="t_s", y="soc_pct", title="State of Charge (%)", color_discrete_sequence=["#79c0ff"])
-    fig_soc.add_vline(x=t_curr, line_dash="dash", line_color="#ffffff")
-    fig_soc.update_layout(template="plotly_dark", height=280, margin=dict(l=20, r=20, t=40, b=20))
+    # 5. SOC chart (#0091B9 Teal)
+    fig_soc = px.area(plot_df, x="t_s", y="soc_pct", title="State of Charge (%)", color_discrete_sequence=["#0091B9"])
+    fig_soc.add_vline(x=t_curr, line_dash="dash", line_color="#002B5B")
+    fig_soc.update_traces(fillcolor="rgba(0, 145, 185, 0.12)")
+    fig_soc.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=280, margin=dict(l=20, r=20, t=40, b=20), hovermode="x unified")
     st.plotly_chart(fig_soc, use_container_width=True)
 
-    # 6. Predicted vs Actual T
+    # 6. Predicted vs Actual T (#004E9B vs #FF6500)
     dT_dt_vals = plot_df["dT_dt"].values if "dT_dt" in plot_df.columns else 0.02
     plot_pred_t = plot_df["temp_c"].values + dT_dt_vals * 10.0
     fig_pvsa = go.Figure()
-    fig_pvsa.add_trace(go.Scatter(x=plot_df["t_s"], y=plot_df["temp_c"], mode="lines", name="Actual T", line=dict(color="#58a6ff")))
-    fig_pvsa.add_trace(go.Scatter(x=plot_df["t_s"], y=plot_pred_t, mode="lines", name="Predicted T (t+10)", line=dict(color="#f0883e", dash="dot")))
-    fig_pvsa.add_vline(x=t_curr, line_dash="dash", line_color="#ffffff")
-    fig_pvsa.update_layout(title="Predicted vs Actual Temperature (°C)", template="plotly_dark", height=280, margin=dict(l=20, r=20, t=40, b=20))
+    fig_pvsa.add_trace(go.Scatter(x=plot_df["t_s"], y=plot_df["temp_c"], mode="lines", name="Actual T", line=dict(color="#004E9B", width=2)))
+    fig_pvsa.add_trace(go.Scatter(x=plot_df["t_s"], y=plot_pred_t, mode="lines", name="Predicted T (t+10)", line=dict(color="#FF6500", width=2, dash="dot")))
+    fig_pvsa.add_vline(x=t_curr, line_dash="dash", line_color="#002B5B")
+    fig_pvsa.update_layout(title="Predicted vs Actual Temperature Horizon (°C)", template="plotly_white", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=280, margin=dict(l=20, r=20, t=40, b=20), hovermode="x unified")
     st.plotly_chart(fig_pvsa, use_container_width=True)
 
 # 6. Contributing Factors Bar Chart
-st.subheader("⚖️ Risk Component Breakdown")
+st.header("⚖️ Risk Component Breakdown")
 factors_data = []
 for f in assessment.factors:
     factors_data.append({
@@ -234,15 +325,11 @@ fig_bar = px.bar(
     y="Factor",
     orientation="h",
     color="Weighted Contribution",
-    color_continuous_scale="Reds",
-    title="Top Contributing Risk Factors",
+    color_continuous_scale=[[0.0, "#0091B9"], [0.5, "#FFD500"], [1.0, "#FF6500"]],
+    title="Top Contributing Risk Factors (Monotonic Attribution)",
 )
-fig_bar.update_layout(template="plotly_dark", height=250, margin=dict(l=20, r=20, t=40, b=20))
+fig_bar.update_layout(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=250, margin=dict(l=20, r=20, t=40, b=20))
 st.plotly_chart(fig_bar, use_container_width=True)
 
-# Footer
-st.markdown("---")
-st.markdown(
-    '<div class="footer-guard">⚠️ <strong>Decision-support prototype. Not for vehicle control.</strong></div>',
-    unsafe_allow_html=True,
-)
+render_footer()
+

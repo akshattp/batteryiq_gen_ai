@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import sys
+import importlib
 from pathlib import Path
 import pandas as pd
 import plotly.graph_objects as go
@@ -10,42 +12,20 @@ import streamlit as st
 from guardian.risk.engine import assess
 from guardian.risk.whatif import simulate_whatif
 
+if "app.ui_theme" in sys.modules:
+    importlib.reload(sys.modules["app.ui_theme"])
+else:
+    import app.ui_theme
+from app.ui_theme import inject_theme, render_header, render_footer, make_gauge_chart
+
 st.set_page_config(page_title="What-If Simulation | Guardian", page_icon="🎛️", layout="wide")
 
-st.markdown(
-    """
-    <style>
-    .footer-guard {
-        margin-top: 50px;
-        padding: 14px;
-        background-color: #161b22;
-        border-top: 1px solid #30363d;
-        text-align: center;
-        font-size: 0.85rem;
-        color: #8b949e;
-    }
-    .badge-normal { background-color: #0e4429; color: #3fb950; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
-    .badge-warning { background-color: #4d3800; color: #d29922; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
-    .badge-high { background-color: #5a1e02; color: #f0883e; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
-    .badge-critical { background-color: #5c1414; color: #f85149; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
-    .badge-ood {
-        background-color: #ffebe9;
-        border: 2px solid #cf222e;
-        color: #cf222e;
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 1rem;
-        display: inline-block;
-        margin-bottom: 12px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
+render_header(
+    title="Interactive What-If Simulation Lab",
+    subtitle="Stress-Test Electrochemical Operating Bounds, Observe Thermal Horizon & Verify Safety Guardrails",
+    badge_text="SIMULATION TWIN",
+    tag="WORKBENCH 04",
 )
-
-st.title("🎛️ Interactive What-If Simulation")
-st.caption("Stress-test battery operating conditions, observe forward risk projection, and verify safety guardrails.")
 
 # Baseline parameters
 col_base, col_mod = st.columns([1, 1])
@@ -91,13 +71,13 @@ base_assessment = assess(
 
 mod_assessment, is_ood = simulate_whatif(base_state, mod_params)
 
-st.markdown("---")
-st.subheader("3. Side-by-Side Comparison: Current vs What-If")
+st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+st.header("3. Side-by-Side Comparison: Current vs What-If")
 
 # Out of Distribution Warning Banner
 if is_ood:
     st.markdown(
-        '<div class="badge-ood">⚠️ Outside training range — extrapolation, low confidence</div>',
+        '<div style="margin-bottom: 12px;"><span class="chip chip-warning">⚠️ OUTSIDE TRAINING RANGE &bull; LOW CONFIDENCE EXTRAPOLATION</span></div>',
         unsafe_allow_html=True,
     )
     st.warning("One or more operating parameters exceed the NASA baseline training envelope (Current: 0-3.0A, Temp: 18-45°C).")
@@ -108,46 +88,45 @@ base_lvl = base_assessment.risk_level.value if hasattr(base_assessment.risk_leve
 mod_lvl = mod_assessment.risk_level.value if hasattr(mod_assessment.risk_level, "value") else str(mod_assessment.risk_level)
 
 with c_res1:
-    st.markdown("#### 🔵 Baseline State Results")
-    st.markdown(f"**Risk Level:** <span class='badge-{base_lvl.lower()}'>{base_lvl}</span>", unsafe_allow_html=True)
-    st.metric("Risk Score", f"{base_assessment.risk_score:.1f}")
+    st.subheader("🔵 Baseline State Results")
+    fig_base_gauge = make_gauge_chart(base_assessment.risk_score, "BASELINE RISK")
+    st.plotly_chart(fig_base_gauge, use_container_width=True)
+    st.markdown(f"**Severity Level:** <span class='chip chip-info'>{base_lvl}</span>", unsafe_allow_html=True)
     st.metric("Predicted Temp (t+10)", f"{base_assessment.predicted_temp_c:.1f} °C")
 
 with c_res2:
-    st.markdown("#### 🟠 Simulated What-If Results")
-    st.markdown(f"**Risk Level:** <span class='badge-{mod_lvl.lower()}'>{mod_lvl}</span>", unsafe_allow_html=True)
+    st.subheader("🟠 Simulated What-If Results")
+    fig_mod_gauge = make_gauge_chart(mod_assessment.risk_score, "SIMULATED RISK")
+    st.plotly_chart(fig_mod_gauge, use_container_width=True)
     score_delta = mod_assessment.risk_score - base_assessment.risk_score
     temp_delta = mod_assessment.predicted_temp_c - base_assessment.predicted_temp_c
-    st.metric("Risk Score", f"{mod_assessment.risk_score:.1f}", delta=f"{score_delta:+.1f}")
-    st.metric("Predicted Temp (t+10)", f"{mod_assessment.predicted_temp_c:.1f} °C", delta=f"{temp_delta:+.1f} °C")
+    mod_chip = '<span class="chip chip-danger"><span class="chip-pulse"></span> CRITICAL</span>' if mod_assessment.risk_score >= 75 else ('<span class="chip chip-warning">ELEVATED</span>' if mod_assessment.risk_score >= 50 else '<span class="chip chip-info">NOMINAL</span>')
+    st.markdown(f"**Severity Level:** {mod_chip}", unsafe_allow_html=True)
+    st.metric("Predicted Temp Delta", f"{mod_assessment.predicted_temp_c:.1f} °C", delta=f"{temp_delta:+.1f} °C")
 
 if mod_assessment.hard_overrides:
-    st.markdown("#### 🚨 Active Hard Safety Overrides:")
+    st.markdown("<h4 class='h4-title' style='color: #FF6500;'>🚨 Active Hard Safety Overrides:</h4>", unsafe_allow_html=True)
     for h in mod_assessment.hard_overrides:
         st.error(f"• {h}")
 
 # Comparison Bar Chart
-st.markdown("---")
-st.subheader("📊 Comparative Risk Metric Delta")
+st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+st.header("📊 Comparative Risk Metric Delta")
 
 fig = go.Figure()
 fig.add_trace(go.Bar(
     name="Baseline State",
     x=["Temperature (°C)", "Predicted Temp (°C)", "Discharge Current (A)", "Risk Score (0-100)"],
     y=[base_temp, base_assessment.predicted_temp_c, base_current, base_assessment.risk_score],
-    marker_color="#58a6ff",
+    marker_color="#0091B9",
 ))
 fig.add_trace(go.Bar(
     name="What-If Scenario",
     x=["Temperature (°C)", "Predicted Temp (°C)", "Discharge Current (A)", "Risk Score (0-100)"],
     y=[mod_temp, mod_assessment.predicted_temp_c, mod_current, mod_assessment.risk_score],
-    marker_color="#f85149" if mod_assessment.risk_score > 55 else "#f0883e",
+    marker_color="#FF6500" if mod_assessment.risk_score > 55 else "#FFD500",
 ))
-fig.update_layout(barmode="group", template="plotly_dark", height=320, margin=dict(l=20, r=20, t=30, b=20))
+fig.update_layout(barmode="group", template="plotly_white", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=320, margin=dict(l=20, r=20, t=30, b=20))
 st.plotly_chart(fig, use_container_width=True)
 
-st.markdown("---")
-st.markdown(
-    '<div class="footer-guard">⚠️ <strong>Decision-support prototype. Not for vehicle control.</strong></div>',
-    unsafe_allow_html=True,
-)
+render_footer()
